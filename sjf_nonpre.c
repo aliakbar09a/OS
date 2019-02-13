@@ -19,6 +19,7 @@ int main()
 			printf("Enter the arrival and burst time of p%d : ", i+1);
 			scanf("%d%d", &p[i].at, &p[i].bt);
     }
+	// initial sorting 
     for(int i=0;i<len;i++)
     {
     	for(int j=i+1;j<len;j++)
@@ -29,6 +30,15 @@ int main()
 				p[i]=p[j];
 				p[j]=temp;
 			}
+			else if (p[i].at == p[j].at)
+            {
+                if(p[i].bt > p[j].bt)
+      			{
+      				temp=p[i];
+      				p[i]=p[j];
+      				p[j]=temp;
+      			}
+            }
 		}
     }
     current_time = p[0].at;
