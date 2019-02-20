@@ -1,153 +1,118 @@
-#include<stdio.h>
-struct process
+#include <stdio.h>
+#include <stdlib.h>
+
+void ganttchart (int s[], int n)
 {
-	int pid;
-	int at;
-	int bt;
-	int ct;
-  int rt;
-};
-void sort_arr(struct process p[], int a, int b)
-{
-    struct process temp;
-    for(int i=a;i<b;i++)
-    {
-    	for(int j=i+1;j<b;j++)
-  		{
-  			if(p[i].at > p[j].at)
-  			{
-  				temp=p[i];
-  				p[i]=p[j];
-  				p[j]=temp;
-  			}
-            else if (p[i].at == p[j].at)
-            {
-                if(p[i].bt > p[j].bt)
-      			{
-      				temp=p[i];
-      				p[i]=p[j];
-      				p[j]=temp;
-      			}
-            }
-  		}
-    }
+	int i, j;
+	printf("\n");
+	for(i=0; i<n; i++)
+		printf("---");
+	printf("\n");
+	
+	for(i=0; i<n; i++)
+	{
+		if(s[i]==10)
+			printf("|ID");
+		if(s[i]!=s[i-1] && s[i]!=10)
+			printf("|P%d", s[i]);
+		if(s[i]==s[i-1])
+			printf("   ");
+		if(i==n-1)
+			printf("|");
+	}
+	printf("\n");
+
+	for(i=0; i<n; i++)
+		printf("---");
+	printf("\n");
+	
+	for(i=0;i<n;i++)
+	{
+		if(s[i]==10 || (s[i]!=s[i-1] && s[i]!=10))
+			printf("%d  ", i);
+		if(s[i]==s[i-1])
+			printf("   ");
+		if(i==n-1)
+			printf("\n");
+	}		
 }
-void sort_rem(struct process p[], int a, int b)
+
+void drawtable (int a[], int t[], int c[], int tatime[], int wtime[], int p)
 {
-    struct process temp;
-    for(int i=a;i<b;i++)
+    int i, j;
+    printf("\n-------------------------------------------------------------------------------------------------\n");
+    printf("|    Programs   | Arrival Time  |  Burst Time   |Completion Time|Turnaround Time| Waiting Time  |");
+    printf("\n-------------------------------------------------------------------------------------------------\n");
+    for (i=0; i<p; i++)
     {
-    	for(int j=i+1;j<b;j++)
-  		{
-  			if(p[i].rt > p[j].rt)
-  			{
-  				temp=p[i];
-  				p[i]=p[j];
-  				p[j]=temp;
-  			}
-            else if (p[i].rt == p[j].rt)
-            {
-                if(p[i].at > p[j].at)
-      			{
-      				temp=p[i];
-      				p[i]=p[j];
-      				p[j]=temp;
-      			}
-            }
-  		}
-    }
-}
+        //printf("|\tP%d\t|\t%d\t|\t%d\t|\t%d\t|\t%d\t|\t%d\t|\n", i, a[i-1], b[i-1], c[prog[i]], tt[prog[i]]-tt[prog[i]-1], w[prog[i]]-w[prog[i]-1]);
+        printf("|\tP%d\t|\t%d\t|\t%d\t|\t%d\t|\t%d\t|\t%d\t|\n", i+1, a[i], t[i], c[i], tatime[i], wtime[i]);
+
+        //printf("%d ", prog[i]);
+    }  
+    printf("-------------------------------------------------------------------------------------------------\n");
+} 
+
 int main()
 {
-		struct process p[10], temp;
-    int ct[10],current_time,k,len ,waiting_sum=0, turnaround_sum=0, ready_queue[10]	, pos, j;
-    printf("Enter the no. of processes : ");
-    scanf("%d", &len);
-    for(int i=0;i<len;i++)
-    {
-			p[i].pid=i+1;
-			p[i].ct=0;
-			printf("Enter the arrival and burst time of p%d : ", i+1);
-			scanf("%d%d", &p[i].at, &p[i].bt);
-      p[i].rt = p[i].bt;
-    }
-    // initial sorting
-    sort_arr(p, 0, len);
-    for(int i=0;i<len;i++)
-        printf("p%d ", p[i].pid);
-    printf("\nnow\n");
-    current_time = p[0].at;
-    // printf("%d ", current_time);
-    for(int i=0;i<len;)
-    {
-        printf("current = %d", current_time);
-        if (current_time <= p[len-1].at)
-        {
-            j=i+1;
-            while(p[j].at<=current_time && j<len)
-        		j++;
-            current_time = current_time + p[j].at - p[i].at;
-            p[i].rt = p[i].rt - (p[i+1].at - p[i].at);
-            if(p[i].rt == 0)
-            {
-                p[i].ct = current_time;
-                i++;
-            }
+	int b[10], w[10], a[10], c[10], t[10], s[50], g[50], tatime[10], wtime[10];
+	int i, j, min, count = 0, n;
+	double wt = 0, tat = 0, ct, awt, atat;
 
-            sort_rem(p, i, j);
-        }
-        else
-        {
-            current_time = current_time + p[i].rt;
-            p[i].rt = 0;
-            p[i].ct = current_time;
-            i++;
-            sort_rem(p, i, len);
-        }
-        for(int nw=0;nw<len;nw++)
-        {
-            if(nw == i)
-                printf("c");
-            printf("p%d %d ", p[nw].pid, p[nw].rt);
-        }
-        printf("\n");
+	printf("\nPREEMPTIVE SHORTEST JOB FIRST:");
+    printf("\nEnter the number of processes: ");
+    scanf("%d", &n);
+    for(i=0; i<n; i++)
+    {
+        printf("Enter the arrival time of P%d: ", i+1);
+        scanf("%d", &a[i]);
+        printf("Enter the burst time of P%d: ", i+1);
+        scanf("%d", &b[i]);
+        t[i]=b[i];
+    }
 
-    }
-    printf("\n");
-    for(int i=0;i<len;i++)
-    {
-    	for(int j=i+1;j<len;j++)
-			{
-				if(p[i].pid > p[j].pid)
-				{
-					temp=p[i];
-					p[i]=p[j];
-					p[j]=temp;
-				}
-			}
-    }
-    for(int i=0;i<len;i++)
-    {
-        printf("p%d arrival time =%d, burst time=%d, completion time=%d\n", p[i].pid, p[i].at, p[i].bt, p[i].ct);
-    }
-	for(int i=0;i<len;i++)
-    {
-    	for(int j=i+1;j<len;j++)
+	b[9]=9999;
+
+    for(i=0; count!=n; i++)
+	{
+		min=9;
+		for(j=0; j<n; j++)
 		{
-			if(p[i].ct > p[j].ct)
+			if(a[j]<=i && b[j]<=b[min] && b[j]>0)
 			{
-				temp=p[i];
-				p[i]=p[j];
-				p[j]=temp;
-			}
+				if(b[j]==b[min])
+				{
+					if(a[j]<a[min])
+						min=j;
+				}
+				else
+					min=j;   
+            }
 		}
-    }
-	printf("\nGantt Chart\n0");
-	if(p[0].at != 0)
-		printf("##%d", p[0].at);
-	for(int i=0;i<len;i++)
-    {
-        printf(" p%d %d", p[i].pid, p[i].ct);
-    }
-	printf("\n");
+		s[i]=min+1;
+		g[i]=i;
+		b[min]--;
+		if(b[min]==0 && min!=9)
+        {
+			count++;
+			ct=i+1;
+			c[min]=ct;
+			wt+=ct-a[min]-t[min];
+			tat+=ct-a[min];
+        }
+	}
+    ganttchart(s, i);
+	for(i=0; i<n; i++)
+	{
+		tatime[i]=c[i]-a[i];
+		wtime[i]=tatime[i]-t[i];
+	}
+	drawtable(a, t, c, tatime, wtime, n);
+	
+    awt=wt/n; 
+    atat=tat/n;
+    printf("\n\nAverage Waiting Time: %lf", awt);
+    printf("\nAverage Turnaround Time: %lf", atat);
+    
+    return 0;
 }

@@ -1,102 +1,146 @@
-#include<stdio.h>
-struct process
+#include <stdio.h>
+#include <stdlib.h>
+
+void ganttchart(int t[], int s[], int p)
 {
-	int pid;
-	int at;
-	int bt;
-	int ct;
-};
+	int i, j;
+	for (i=0; i<=p; i++)
+		for (j=0; j<=2*(t[i+1]-t[i]); j++)
+			if (j==0)
+				printf(" ");
+			else
+				printf("-");
+	printf("\n");
+	for (i=0; i<=p; i++)
+		for (j=0; j<=2*(t[i+1]-t[i]); j++)
+			if (j==0)
+				printf("|");
+			else if (j==(t[i+1]-t[i])&&i!=0)
+			{
+				printf("P%d", s[i-1]+1);
+				j++;
+			}
+			else if (j==(t[i+1]-t[i])&&i==0)
+			{
+				printf("ID");
+				j++;
+			}
+			else
+				printf(" ");			
+	printf("|\n");
+	for (i=0; i<=p; i++)
+		for (j=0; j<=2*(t[i+1]-t[i]); j++)
+			if (j==0)
+				printf(" ");
+			else
+				printf("-");
+	printf("\n");
+	
+	for (i=0; i<=p; i++)
+		for (j=0; j<=2*(t[i+1]-t[i]); j++)
+			if (j==0)
+			{
+				printf("%d", t[i]);
+			}
+			else
+				printf(" ");
+	printf("%d\n", t[p+1]);
+}
+
+void drawtable (int a[], int t[], int c[], int tatime[], int wtime[], int p)
+{
+    int i, j;
+    printf("\n-------------------------------------------------------------------------------------------------\n");
+    printf("|    Programs   | Arrival Time  |  Burst Time   |Completion Time|Turnaround Time| Waiting Time  |");
+    printf("\n-------------------------------------------------------------------------------------------------\n");
+    for (i=0; i<p; i++)
+    {
+        //printf("|\tP%d\t|\t%d\t|\t%d\t|\t%d\t|\t%d\t|\t%d\t|\n", i, a[i-1], b[i-1], c[prog[i]], tt[prog[i]]-tt[prog[i]-1], w[prog[i]]-w[prog[i]-1]);
+        printf("|\tP%d\t|\t%d\t|\t%d\t|\t%d\t|\t%d\t|\t%d\t|\n", i+1, a[i], t[i], c[i], tatime[i], wtime[i]);
+
+        //printf("%d ", prog[i]);
+    }  
+    printf("-------------------------------------------------------------------------------------------------\n");
+} 
+
 int main()
 {
-		struct process p[10], temp;
-    int ct[10],current_time,k,len ,waiting_sum=0, turnaround_sum=0, ready_queue[10]	, pos, j;
-    printf("Enter the no. of processes : ");
-    scanf("%d", &len);
-    for(int i=0;i<len;i++)
+	int b[10], w[10], a[10], c[10], tatime[10], t[10], gantt[50], wtime[10], s[50];
+	int i, j, k=0, min, count = 0, n, r=0;
+	double wt = 0, tat = 0, ct, awt, atat;
+
+	printf("\nNON-PREEMPTIVE SHORTEST JOB FIRST:");
+    printf("\nEnter the number of processes: ");
+    scanf("%d", &n);
+    for(i=0; i<n; i++)
     {
-			p[i].pid=i+1;
-			p[i].ct=0;
-			printf("Enter the arrival and burst time of p%d : ", i+1);
-			scanf("%d%d", &p[i].at, &p[i].bt);
+        printf("Enter the arrival time of P%d: ", i+1);
+        scanf("%d", &a[i]);
+        printf("Enter the burst time of P%d: ", i+1);
+        scanf("%d", &b[i]);
+        t[i]=b[i];
+        w[i]=b[i];
+        //bt[i]=b[i];
     }
-	// initial sorting 
-    for(int i=0;i<len;i++)
-    {
-    	for(int j=i+1;j<len;j++)
+
+    //c[0]=w[0]=tt[0]=prog[0]=0;
+	b[9]=9999;
+	for(i=0; count!=n; i++)
+	{
+		min=9;
+		for(j=0; j<n; j++)
 		{
-			if(p[i].at > p[j].at)
+			if(a[j]<=i && b[j]<b[min] && b[j]>0)
+				//min=j;
 			{
-				temp=p[i];
-				p[i]=p[j];
-				p[j]=temp;
+				if(b[j]==b[min])
+				{
+					if(a[j]<a[min])
+						min=j;
+				}
+				else				
+					min=j;
 			}
-			else if (p[i].at == p[j].at)
-            {
-                if(p[i].bt > p[j].bt)
-      			{
-      				temp=p[i];
-      				p[i]=p[j];
-      				p[j]=temp;
-      			}
-            }
 		}
-    }
-    current_time = p[0].at;
-    for(int i=0;i<len;i++)
-    {
-    	j=i+1;
-    	while(p[j].at<=current_time && j<len)
-    		j++;
-    	for(int k=i; k<j;k++)
-    	{
-    		for(int l=k+1; l<j;l++)
-    		{
-    			if(p[l].bt<p[k].bt)
-    			{
-    				temp=p[k];
-					p[k]=p[l];
-					p[l]=temp;
-    			}
-    		}
-    	}
-    	current_time = current_time + p[i].bt;
-   		p[i].ct = current_time;
-    }
-    printf("\n");
-    for(int i=0;i<len;i++)
-    {
-    	for(int j=i+1;j<len;j++)
-			{
-				if(p[i].pid > p[j].pid)
-				{
-					temp=p[i];
-					p[i]=p[j];
-					p[j]=temp;
-				}
-			}
-    }
-    for(int i=0;i<len;i++)
-    {
-        printf("p%d arrival time =%d, burst time=%d, completion time=%d\n", p[i].pid, p[i].at, p[i].bt, p[i].ct);
-    }
-		for(int i=0;i<len;i++)
-    {
-    	for(int j=i+1;j<len;j++)
-			{
-				if(p[i].ct > p[j].ct)
-				{
-					temp=p[i];
-					p[i]=p[j];
-					p[j]=temp;
-				}
-			}
-    }
-		printf("\nGantt Chart\n0");
-		if(p[0].at != 0)
-			printf("##%d", p[0].at);
-		for(int i=0;i<len;i++)
-    {
-        printf(" p%d %d", p[i].pid, p[i].ct);
-    }
-		printf("\n");
+		
+		if(min!=9)
+        {
+			s[k]=min;
+			k++;
+			gantt[k]=i;
+			
+			count++;
+			ct=i+b[min];
+			c[min]=ct;
+			i=ct-1;
+	
+			wt+=ct-a[min]-t[min];
+			tat+=ct-a[min];
+			b[min]=0;
+            
+            /*
+            c[k]=ct;
+            w[k]=wt;
+            tt[k]=tat;
+            k++; */
+        }
+        //if (i!=0)
+        //    prog[k-1]=min+1;
+	}
+	for(i=0;i<n;i++)
+	{
+		tatime[i]=c[i]-a[i];
+		wtime[i]=tatime[i]-t[i];
+	}
+	gantt[0]=0;
+	gantt[j+1]=ct;
+	
+    drawtable(a, t, c, tatime, wtime, n);
+	ganttchart(gantt, s, n);
+    awt=wt/n; 
+    atat=tat/n;
+    printf("\nAverage Waiting Time: %lf", awt);
+    printf("\nAverage Turnaround Time: %lf", atat);
+
+    return 0;
 }
